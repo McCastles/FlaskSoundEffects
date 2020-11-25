@@ -3,6 +3,7 @@
 
 <head>
     <link rel="stylesheet" href="/static/css/custom.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 </head>
 
 <body>
@@ -21,12 +22,15 @@
 
             <td>
 
-                
+
+
                 {% for module in pipeline %}
+
 
                 <a href="/?html_for={{module['code']}}">
                     <div id="{{module['code']}}" class="take_meals_opt">{{module['title']}}</div>
                 </a>
+
 
                 {% endfor %}
 
@@ -48,7 +52,15 @@
             <td>
 
                 {% if html_for == 'AE' %}
-                    {% include 'addeffect.html' %}
+                {% include 'add_effect.html' %}
+
+
+                {% elif html_for == 'UA' %}
+                {% include 'upload_audio.html' %}
+
+                {% elif html_for == 'PA' %}
+                {% include 'no_audio.html' %}
+
                 {% endif %}
 
             </td>
