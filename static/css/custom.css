@@ -1,0 +1,47 @@
+.take_meals_opt{
+	display:block;
+  width:150px;
+  height:150px;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 150px; 
+	margin:0 10px 10px 0;
+	padding:10px 21px;
+	text-transform:uppercase;
+	font-family:'Arial';
+	font-weight:400;
+	font-size:16px;
+  text-transform: uppercase;
+	color:white; /*#3e3e3e;*/
+	background:#53b7e8; /*#7cb289;*/
+	border-bottom:1px solid #343434;
+	transition: all 0.4s ease-in-out;
+	-moz-transition: all 0.4s ease-in-out;
+	-webkit-transition: all 0.4s ease-in-out;
+	-o-transition: all 0.4s ease-in-out;
+  float: left;
+}
+
+.title{
+  display:inline-block;
+  font-family:'Arial';
+  color:white;
+  Background:rgba(30,30,30,0.5);
+  padding:10px 25px 10px 25px;
+  margin:50px 20px 5px 5px;
+}
+
+.clear{clear:both;display:block;overflow:hidden;visibility:hidden;width:0;height:0}
+
+body{
+  /* background:url("http://ntkanit.com/projects/thaimeals.com/images/slide1_bg.jpg"); */
+}
+
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+th, td {
+  padding: 5px;
+  text-align: left;    
+}

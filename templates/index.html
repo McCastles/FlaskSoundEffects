@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="/static/css/custom.css">
+</head>
+
+<body>
+
+
+    <div>
+        <h1 class="title">Virtual Pedalboard</h1>
+    </div>
+
+    <table style="width:100%">
+
+
+
+        <!-- PIPELINE -->
+        <tr>
+
+            <td>
+
+                
+                {% for module in pipeline %}
+
+                <a href="/?html_for={{module['code']}}">
+                    <div id="{{module['code']}}" class="take_meals_opt">{{module['title']}}</div>
+                </a>
+
+                {% endfor %}
+
+
+
+
+            </td>
+        </tr>
+
+
+
+        <!-- CONTROLS -->
+
+
+
+        {% if html_for is defined %}
+        <tr>
+
+            <td>
+
+                {% if html_for == 'AE' %}
+                    {% include 'addeffect.html' %}
+                {% endif %}
+
+            </td>
+
+        </tr>
+
+        {% endif %}
+    </table>
+
+
+
+
+
+
+</body>
+
+</html>
