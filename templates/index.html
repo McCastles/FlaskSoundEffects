@@ -27,7 +27,7 @@
                 {% for module in pipeline %}
 
 
-                <a href="/?html_for={{module['code']}}">
+                <a href="/?html_for={{module['code']}}&module_id={{module['id']}}">
                     <div id="{{module['code']}}" class="take_meals_opt">{{module['title']}}</div>
                 </a>
 
@@ -60,6 +60,12 @@
 
                 {% elif html_for == 'PA' %}
                 {% include 'no_audio.html' %}
+
+                {% elif html_for == 'DE' %}
+                {% include 'delay.html' %}
+
+                {% elif html_for == 'FL' %}
+                {% include 'flanger.html' %}
 
                 {% endif %}
 

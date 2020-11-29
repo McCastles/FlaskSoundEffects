@@ -1,0 +1,72 @@
+
+{{mem}}
+<form method="POST" action="/?module_id={{mem['module_id']}}&new_effect={{mem['code']}}">
+
+
+    <table style="width: 652px;">
+        <tbody>
+            <tr>
+                <td rowspan="3">
+                    <img src="/static/images/delay.jpg">
+                </td>
+                <td>
+                    <div class="tooltip">
+                        <p class="parameters">Delay time (ms)</p>
+                        <span class="tooltiptext">offset (in ms) for the delay of the following repeat</span>
+                    </div>
+                </td>
+                <td>
+                    <input style="font-size: 35px;"
+                        class="parameters"
+                        type="number"
+                        value="{{ mem['params']['time'] }}"
+                        min="100" max="1500"
+                        step="10" name="time">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="tooltip">
+                        <p class="parameters">Number of repeats</p>
+                        <span class="tooltiptext">total number of repeats (not counting the original wave)</span>
+                    </div>
+                </td>
+                <td>
+                    <input style="font-size: 35px;"
+                    class="parameters"
+                    type="number"
+                    value="{{ mem['params']['repeats'] }}"
+                    min="1" max="5"
+                    step="1" name="repeats">
+                </td>
+
+            </tr>
+            <tr>
+                <td>
+                    <div class="tooltip">
+                        <p class="parameters">Factor (%)</p>
+                        <span class="tooltiptext">% of the previous repeat to be carried further</span>
+                    </div>
+                </td>
+                <td>
+                    <input style="font-size: 35px;"
+                        class="parameters"
+                        type="number"
+                        value="{{ mem['params']['factor'] }}"
+                        min="1"
+                        max="100"
+                        step="1"
+                        name="factor">
+                </td>
+
+            </tr>
+            <tr>
+                <td>
+                    <input class="submit" type="submit" value="Apply" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+</form>

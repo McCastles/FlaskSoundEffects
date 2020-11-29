@@ -1,10 +1,34 @@
 .take_meals_opt{
 	display:block;
   width:150px;
-  height:150px;
+  height:100px;
   text-align: center;
   vertical-align: middle;
-  line-height: 150px; 
+  line-height: 100px; 
+	margin:0 10px 10px 0;
+	padding:10px 21px;
+	text-transform:uppercase;
+	font-family:'Arial';
+	font-weight:400;
+	font-size:16px;
+	color:white; /*#3e3e3e;*/
+	background:#53b7e8; /*#7cb289;*/
+	border-bottom:1px solid #343434;
+	transition: all 0.4s ease-in-out;
+	-moz-transition: all 0.4s ease-in-out;
+	-webkit-transition: all 0.4s ease-in-out;
+	-o-transition: all 0.4s ease-in-out;
+  float: left;
+}
+
+
+.parameters {
+  display:block;
+  width:300px;
+  height:50px;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 50px; 
 	margin:0 10px 10px 0;
 	padding:10px 21px;
 	text-transform:uppercase;
@@ -19,16 +43,42 @@
 	-moz-transition: all 0.4s ease-in-out;
 	-webkit-transition: all 0.4s ease-in-out;
 	-o-transition: all 0.4s ease-in-out;
-  float: left;
+  float: left; 
 }
+
+
+.submit {
+  display:block;
+  width:200px;
+  height:50px;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 30px; 
+	margin:0 10px 10px 0;
+	padding:10px 21px;
+	text-transform:uppercase;
+	font-family:'Arial';
+	font-weight:400;
+	font-size:16px;
+  text-transform: uppercase;
+	color:white; /*#3e3e3e;*/
+	background:#53b7e8; /*#7cb289;*/
+	border-bottom:1px solid #343434;
+	transition: all 0.4s ease-in-out;
+	-moz-transition: all 0.4s ease-in-out;
+	-webkit-transition: all 0.4s ease-in-out;
+	-o-transition: all 0.4s ease-in-out;
+  float: left; 
+}
+
 
 .title{
   display:inline-block;
   font-family:'Arial';
   color:white;
   Background:rgba(30,30,30,0.5);
-  padding:10px 25px 10px 25px;
-  margin:50px 20px 5px 5px;
+  /* padding:10px 25px 10px 25px; */
+  /* margin:50px 20px 5px 5px; */
 }
 
 
@@ -40,10 +90,48 @@ body{
 }
 
 table, th, td {
-  border: 1px solid black;
+  
   border-collapse: collapse;
 }
-th, td {
-  padding: 5px;
-  text-align: left;    
+
+img {
+  max-width:80%;
+  max-height:80%;
+  /* width: 200px;
+  width: 300px; */
+}
+
+
+
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  /* width: 120px; */
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+ 
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+
+  max-width: 120%;
+  /* width: 400px; */
+  top: 100%;
+  left: 50%;
+  margin-left: -60px;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }
