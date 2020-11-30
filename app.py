@@ -11,11 +11,19 @@ app.debug = False
 
 
 existing_modules = {
-    'UA': {'id':1, 'code':'UA', 'title': 'Upload Audio'},
-    'AE': {'id':2, 'code':'AE', 'title': 'Add Effect'},
-    'PA': {'id':3, 'code':'PA', 'title': 'Play Audio'},
-    'FL': {'id':None, 'code':'FL', 'title': 'Flanger'},
-    'DE': {'id':None, 'code':'DE', 'title': 'Delay', 'params':{'time':250, 'factor':80, 'repeats':1}}
+    'UA': {'id':1, 'code':'UA', 'title': 'Upload Audio', 'colorscheme': 'take_meals_opt'},
+    'AE': {'id':2, 'code':'AE', 'title': 'Add Effect', 'colorscheme': 'add'},
+    'PA': {'id':3, 'code':'PA', 'title': 'Play Audio', 'colorscheme': 'take_meals_opt'},
+                                                                            # 0012, 0.5
+    'FL': {'id':None, 'code':'FL', 'title': 'Flanger',
+        'params':{'lfo_amp':0.002, 'lfo_freq':3},
+        'colorscheme': 'flanger'
+        },
+
+    'DE': {'id':None, 'code':'DE', 'title': 'Delay',
+        'params':{'time':250, 'factor':80, 'repeats':1},
+        'colorscheme': 'delay'
+        }
 }
 
 
@@ -37,6 +45,7 @@ def get_module_by_id( module_id ):
             return m
 
 def get_defaults_for_module( code ):
+    print('getting defaults for', code)
     print(existing_modules)
     return existing_modules[code]['params'].copy()
 
@@ -57,6 +66,8 @@ def index():
         print('\t', k, '\t', v)
 
 
+
+
     
 
 
@@ -64,8 +75,10 @@ def index():
     sample_name = request.args.get('sample')
     if sample_name:
         
-        storage['ae_index'] = 1
-        storage['pipeline'].insert(1, existing_modules['AE'].copy())
+        if not storage.get('ae_index'):
+            storage['ae_index'] = 1
+            storage['pipeline'].insert(1, existing_modules['AE'].copy())
+
         storage['current_sample'] = Sample(sample_name)
 
 
@@ -112,10 +125,24 @@ def index():
     
 
 
+    # REMOVE
+    if request.args.get('remove') == '1':
+        pipeline = storage['pipeline']
+        # print(pipeline)
+        for i, m in enumerate(pipeline):
+            if m['id'] == module_id:
+                storage['pipeline'] = pipeline[:i] + pipeline[i+1:]
+        # print(storage['pipeline'])
+        storage['ae_index'] -= 1
+        
+
+    html_for = request.args.get('html_for')
+    
+
 
     # AUDIO PLAYING
     # TODO progress bar?
-    html_for = request.args.get('html_for')
+    
     if html_for == 'PA':
 
         if storage.get('current_sample') != None:
@@ -128,34 +155,22 @@ def index():
             html_for = 'AE'
 
 
-    # Remembered params
-    # mem = None
-    # if module_id:
-    #     for module in storage['pipeline']:
-    #         if module.get('id') > 3:
-    #             if str(module.get('id')) == module_id:
-    #                 mem = module
-    #                 break
-    # print('mem =', mem)
-
-
 
     mem = {}
-    if html_for in ['DE']:
+    if html_for in ['DE', 'FL']:
     
+        # module_id = request.args.get('module_id')
         
         if module_id:
             mem['params'] = get_module_by_id( module_id )['params']
             mem['module_id'] = module_id
-            # mem['command'] = 'Update'
         else:
+
             mem['params'] = get_defaults_for_module( html_for )
             mem['module_id'] = storage['effect_id']
         mem['code'] = html_for
-
-
-
     print('Sending mem...', mem)
+
 
     return render_template(
         'index.html',

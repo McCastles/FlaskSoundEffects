@@ -1,7 +1,10 @@
+import os
 from audioop import add, mul
 import pygame
 import iowave
-
+import numpy as np
+from scipy.io.wavfile import read, write
+from scipy import signal
 
 
 
@@ -14,50 +17,66 @@ class Sample:
         # self.mixer = pygame.mixer.music
         self.name = name
         self.filepath = 'static/samples/' + name + '.wav'
-        self.params, self.audio_bytes = iowave.input_wave( self.filepath )
+        self.outpath = 'static/samples/out_' + name + '.wav'
+        
+        
 
 
 
 
     def play( self, effects_list ):
-
-
         
-                
+        # producing outfile
         self.apply_all_effects( effects_list )
-        print(effects_list)
-
 
         # and then play
         print("Playing... ", self.filepath)
+        pygame.mixer.Sound( self.outpath ).play()
         
-        myBuffer = memoryview(
-            self.audio_bytes
-        )
-        pygame.mixer.Sound(myBuffer).play()
+        # myBuffer = memoryview( self.transformed_bytes )
         
-        # self.mixer.load( self.filepath )
-        # self.mixer.play()
+
+
+
+    def duplicate( self ):
+        
+        os.system( f'cp {self.filepath} {self.outpath}' )
+
 
 
     def apply_all_effects( self, effects_list ):
+
+        # self.transformed_bytes = self.org_bytes
+
+        self.duplicate()
+
         for effect in effects_list:
 
-            print('Applying', effect)
+            print('Applying', effect['code'], effect['id'])
 
             if effect['code'] == 'DE':
-                self.audio_bytes = self.delay(
-                    audio_bytes = self.audio_bytes,
-                    params = self.params,
+                self.delay(
+                    # audio_bytes=self.transformed_bytes,
                     delay_time = effect['params']['time'],
                     factor = effect['params']['factor'],
                     repeats = effect['params']['repeats']
                 )
+
+            elif effect['code'] == 'FL':
+                self.flanger(
+                    # audio_bytes=self.transformed_bytes,
+                    # Fs=self.params.framerate,
+                    lfo_freq=effect['params']['lfo_freq'],
+                    lfo_amp=effect['params']['lfo_amp']
+                )
         
 
 
-    def delay( self, audio_bytes, params, delay_time, factor, repeats ):
-    
+    def delay( self, delay_time, factor, repeats ):
+
+        # filepath.....
+        params, audio_bytes = iowave.input_wave( self.outpath )
+
         factor = int(factor) / 100
         repeats = int(repeats)
         delay_time = int(delay_time)
@@ -79,6 +98,57 @@ class Sample:
             'delay_repeats =', repeats,
             'delay_factor =', factor
         )
+        iowave.output_wave( delayed_bytes, params, self.outpath )
         return delayed_bytes
+
+
+
+    def flanger( self, lfo_freq, lfo_amp ):
+
+
+
+        lfo_freq = float(lfo_freq)
+        lfo_amp = float(lfo_amp)
+        
+
+        def fl_mono( audio_bytes, Fs     ):
+            length = len(audio_bytes)
+            nsample = np.array(range(length))
+        
+            st = 2*np.pi*lfo_freq/Fs
+            lfo = 2 + signal.sawtooth((nsample)*st, 0.5) # Generate triangle wave
+            
+            index = np.around(nsample-Fs*lfo_amp*lfo) # Read-out index
+            index[index<0] = 0 # Clip delay
+            index[index>(length-1)] = length-1
+
+            flanged_bytes=np.zeros(length) # Input Signal
+
+            rate=0.7
+            for j in range(length): # For each sample
+                flanged_bytes[j] = rate*np.float(audio_bytes[j]) + rate*np.float(audio_bytes[int(index[j])]) # Add delayed signal
+            return flanged_bytes
+        
+        # print(len(audio_bytes))
+        # audio_bytes = np.fromstring(audio_bytes, np.int16)
+        # print(len(audio_bytes))
+
+        Fs, data = read( self.outpath )
+
+        bag = []
+
+        for i in range(2):
+            data_mono = [d[i] for d in data]
+            data_fl = []
+            data_fl = fl_mono( data_mono, Fs )
+            data_fl = np.asarray(data_fl, dtype=np.int16)
+            bag.append(data_fl)
+
+        o = np.array([
+            [ lt, rt ] for lt, rt in zip(bag[0], bag[1])
+        ])
+
+        write(self.outpath, Fs, o)
+        
 
         

@@ -5,8 +5,8 @@ def input_wave(filename, frames=10000000, v=False):
     with wave.open(filename,'rb') as wave_file:
         params=wave_file.getparams()
         audio=wave_file.readframes(frames)  
-        if params.nchannels!=1:
-            raise Exception("The input audio should be mono for these examples")
+        # if params.nchannels!=1:
+            # raise Exception("The input audio should be mono for these examples")
         if v:
             print(filename.split("/")[-1] + "\nBytes per sample: {}".format(params.sampwidth), 
             "Samples per second: {}".format(params.framerate),
