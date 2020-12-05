@@ -16,14 +16,30 @@ existing_modules = {
     'PA': {'id':3, 'code':'PA', 'title': 'Play Audio', 'colorscheme': 'take_meals_opt'},
                                                                             # 0012, 0.5
     'FL': {'id':None, 'code':'FL', 'title': 'Flanger',
-        'params':{'lfo_amp':0.002, 'lfo_freq':3},
+        'params':{'sweep_range':12, 'sweep_freq':0.5},
         'colorscheme': 'flanger'
-        },
+    },
 
     'DE': {'id':None, 'code':'DE', 'title': 'Delay',
-        'params':{'time':250, 'factor':80, 'repeats':1},
+        'params':{'time':100, 'factor':80},
+        # 'params':{'time':100, 'factor':80, 'repeats':1},
         'colorscheme': 'delay'
-        }
+    },
+
+    'DI': {'id':None, 'code':'DI', 'title': 'Distortion',
+        'params':{'clipVal':0.05},
+        'colorscheme': 'distortion'
+    },
+
+    'PH': {'id':None, 'code':'PH', 'title': 'Phaser',
+        'params':{'rnge':12, 'sweep':0.3125},
+        'colorscheme': 'phaser'
+    },
+
+    'TR': {'id':None, 'code':'TR', 'title': 'Tremolo',
+        'params':{'freq':3},
+        'colorscheme': 'tremolo'
+    },
 }
 
 
@@ -80,6 +96,7 @@ def index():
             storage['pipeline'].insert(1, existing_modules['AE'].copy())
 
         storage['current_sample'] = Sample(sample_name)
+        storage['sample_name'] = sample_name
 
 
 
@@ -152,12 +169,13 @@ def index():
 
             # also pass effect parameters
             storage['current_sample'].play( all_effects )
+            storage['saved_msg'] = f'Saved to /static/samples/out_{storage["sample_name"]}.wav'
             html_for = 'AE'
 
 
 
     mem = {}
-    if html_for in ['DE', 'FL']:
+    if html_for in ['DE', 'FL', 'PH', 'DI', 'TR']:
     
         # module_id = request.args.get('module_id')
         
@@ -176,7 +194,8 @@ def index():
         'index.html',
         pipeline = storage['pipeline'],
         html_for = html_for,
-        mem=mem
+        mem=mem,
+        saved_msg=storage.get('saved_msg')
     )
 
 

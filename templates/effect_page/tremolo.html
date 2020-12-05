@@ -1,0 +1,42 @@
+
+<!-- {{mem}} -->
+<form method="POST" action="/?module_id={{mem['module_id']}}&new_effect={{mem['code']}}">
+
+
+    <table style="width: 652px;">
+        <tbody>
+            <tr>
+                <td>
+                    <img src="/static/images/tremolo.jpg">
+                </td>
+                <td>
+                    <div class="tooltip">
+                        <p class="tremolo-parameters">Frequency (Hz)</p>
+                        <span class="tooltiptext">Frequency of "shakes" (1-10)</span>
+                    </div>
+                </td>
+                <td>
+                    <input style="font-size: 35px;"
+                        class="tremolo-parameters"
+                        type="number"
+                        value="{{ mem['params']['freq'] }}"
+                        min="1" max="10"
+                        step="1" name="freq">
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <input class="submit" type="submit" value="Apply" />
+                </td>
+                <td>
+                    <a href="/?remove=1&module_id={{mem['module_id']}}">
+                        <div class="submit">Remove effect</div>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+</form>

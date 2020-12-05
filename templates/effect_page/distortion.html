@@ -1,0 +1,42 @@
+
+<!-- {{mem}} -->
+<form method="POST" action="/?module_id={{mem['module_id']}}&new_effect={{mem['code']}}">
+
+
+    <table style="width: 652px;">
+        <tbody>
+            <tr>
+                <td>
+                    <img src="/static/images/distortion.jpg">
+                </td>
+                <td>
+                    <div class="tooltip">
+                        <p class="distortion-parameters">Distortion Level</p>
+                        <span class="tooltiptext">extent of distortion (1 to 10)</span>
+                    </div>
+                </td>
+                <td>
+                    <input style="font-size: 35px;"
+                        class="distortion-parameters"
+                        type="number"
+                        value="{{ mem['params']['clipVal'] }}"
+                        min="1" max="10"
+                        step="1" name="time">
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <input class="submit" type="submit" value="Apply" />
+                </td>
+                <td>
+                    <a href="/?remove=1&module_id={{mem['module_id']}}">
+                        <div class="submit">Remove effect</div>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+</form>

@@ -1,10 +1,10 @@
+import math
 import os
 from audioop import add, mul
 import pygame
-import iowave
 import numpy as np
 from scipy.io.wavfile import read, write
-from scipy import signal
+
 
 
 
@@ -13,142 +13,166 @@ class Sample:
 
     def __init__(self, name):
         
-        pygame.mixer.init()
-        # self.mixer = pygame.mixer.music
+        
         self.name = name
         self.filepath = 'static/samples/' + name + '.wav'
         self.outpath = 'static/samples/out_' + name + '.wav'
         
+        self.rate, _ = read( self.filepath )
+        pygame.mixer.pre_init(44100, 16, 2, 4096)
+        pygame.mixer.init()
+
+        self.effect_mapping = {
+            'DE': self.delay,
+            'FL': self.flanger,
+            'PH': self.phaser,
+            'TR': self.tremolo,
+            'DI': self.distortion,
+        }
         
-
-
 
 
     def play( self, effects_list ):
         
+        # pygame.mixer.Sound( self.outpath ).stop()
+
         # producing outfile
         self.apply_all_effects( effects_list )
 
         # and then play
-        print("Playing... ", self.filepath)
-        pygame.mixer.Sound( self.outpath ).play()
+        # print("Playing... ", self.filepath)
+        # self.blink()
+        # pygame.mixer.Sound( self.outpath ).play()
         
         # myBuffer = memoryview( self.transformed_bytes )
         
 
 
 
-    def duplicate( self ):
+    '''======= EFFECTS ======='''
+
+    def delay( self, x, params ):
         
-        os.system( f'cp {self.filepath} {self.outpath}' )
+        feedback = int(params['factor']) // 100
+        delaytime = int(params['time'])
+        
+        # someday...
+        # num = params['num']
+
+        offset = int( self.rate / 1000 ) * delaytime * 2
+
+        y = np.array( x )
+
+        for i in range( offset, len(x) ):
+            if (i-offset)>0:
+                y[i] = x[i] + (feedback) * (y[ i-offset ])
+
+        return y
+                
+
+
+    def phaser( self, x, params ):
+    
+        rnge = int(params['rnge'])
+        sweep = float(params['sweep'])
+
+        y = np.zeros( len(x) )
+        for i in range( len(x) - rnge ):
+            y[i] = x[i] + x[i + round(rnge * math.sin( (2*math.pi*i*sweep)/ self.rate ))]
+        return y
+
+
+    def flanger( self, x, params ):
+
+        sweep_range = int(params['sweep_range'])
+        sweep_freq = float(params['sweep_freq'])
+        
+        given_delay = 15
+        y = np.zeros( len(x) )
+        for i in range( given_delay+sweep_range, len(x) ):
+            y[i] = x[i] + x[ i - given_delay - round(
+                sweep_range * math.sin(2*math.pi*i*sweep_freq/self.rate)) ]
+        return y
+
+
+    def distortion( self, x, params ):
+        clipVal = float(params['clipVal']) / 100
+        y = np.zeros( len(x) )
+        for i in range(len(x)):
+            if x[i] > clipVal:
+                y[i] = clipVal
+            elif x[i] < -clipVal:
+                y[i] = -clipVal
+            else:
+                y[i] = x[i]
+        return y
+                
+
+    def tremolo( self, x, params ):
+        
+        freq = int(params['freq'])
+        y = np.zeros( len(x) )
+        for i in range( len(x) ):
+            y[i] = math.sin( 2*np.pi*freq/ self.rate *i ) * x[i]
+        # print(freq, self.rate)
+        # print(y)
+        return y
+
+
+
+
+
+    '''======= APPLYING ======='''
+
+    def apply_effect( self, audio, effect_code, params ):
+
+        print('Len before:', len(audio))
+        
+
+        effect = self.effect_mapping[ effect_code ]
+
+        bag = []
+        for i in range(2):
+            channel = [p[i] for p in audio]
+            print(i+1, f'channel (len={len(channel)}):', channel[:5])
+            applied = effect( channel, params )
+            bag.append(applied)
+
+        merged = np.array([
+            [ lt, rt ] for lt, rt in zip(bag[0], bag[1])
+        ])
+
+        # print('\nmerged\n', merged)
+        print('Len after:', len(merged))
+        return merged
+
+
+        
 
 
 
     def apply_all_effects( self, effects_list ):
 
-        # self.transformed_bytes = self.org_bytes
+        # Duplicate
+        os.system( f'cp {self.filepath} {self.outpath}' )
 
-        self.duplicate()
+        divided = False
 
         for effect in effects_list:
 
-            print('Applying', effect['code'], effect['id'])
-
-            if effect['code'] == 'DE':
-                self.delay(
-                    # audio_bytes=self.transformed_bytes,
-                    delay_time = effect['params']['time'],
-                    factor = effect['params']['factor'],
-                    repeats = effect['params']['repeats']
-                )
-
-            elif effect['code'] == 'FL':
-                self.flanger(
-                    # audio_bytes=self.transformed_bytes,
-                    # Fs=self.params.framerate,
-                    lfo_freq=effect['params']['lfo_freq'],
-                    lfo_amp=effect['params']['lfo_amp']
-                )
-        
+            _, audio = read( self.outpath )
 
 
-    def delay( self, delay_time, factor, repeats ):
+            audio = self.apply_effect( audio, effect['code'], effect['params'] )
 
-        # filepath.....
-        params, audio_bytes = iowave.input_wave( self.outpath )
-
-        factor = int(factor) / 100
-        repeats = int(repeats)
-        delay_time = int(delay_time)
-
-        offset = params.sampwidth * delay_time * int( params.framerate / 1000 )
-        audio_bytes = audio_bytes + b'\0' * offset * repeats
-        
-        delayed_bytes = audio_bytes
-        for i in range(1, repeats+1):
-            
-            of = i * offset
-            beginning = b'\0' * of
-            end = audio_bytes[ : -of ]
-            mul_end = mul( end, params.sampwidth, factor**i )
-            delayed_bytes = add( delayed_bytes, beginning + mul_end, params.sampwidth )
-        
-        print('Applied delay with params:',
-            'delay_time =', delay_time,
-            'delay_repeats =', repeats,
-            'delay_factor =', factor
-        )
-        iowave.output_wave( delayed_bytes, params, self.outpath )
-        return delayed_bytes
+            if not divided:
+                audio = audio / 32767
+                divided = True
 
 
+            print('Applied', effect['code'], effect['id'], 'with params:', effect['params'])
+            # if len(audio) != 0:
+            write( self.outpath, self.rate, audio )
+            print( 'Saved to:', self.outpath )
 
-    def flanger( self, lfo_freq, lfo_amp ):
 
-
-
-        lfo_freq = float(lfo_freq)
-        lfo_amp = float(lfo_amp)
-        
-
-        def fl_mono( audio_bytes, Fs     ):
-            length = len(audio_bytes)
-            nsample = np.array(range(length))
-        
-            st = 2*np.pi*lfo_freq/Fs
-            lfo = 2 + signal.sawtooth((nsample)*st, 0.5) # Generate triangle wave
-            
-            index = np.around(nsample-Fs*lfo_amp*lfo) # Read-out index
-            index[index<0] = 0 # Clip delay
-            index[index>(length-1)] = length-1
-
-            flanged_bytes=np.zeros(length) # Input Signal
-
-            rate=0.7
-            for j in range(length): # For each sample
-                flanged_bytes[j] = rate*np.float(audio_bytes[j]) + rate*np.float(audio_bytes[int(index[j])]) # Add delayed signal
-            return flanged_bytes
-        
-        # print(len(audio_bytes))
-        # audio_bytes = np.fromstring(audio_bytes, np.int16)
-        # print(len(audio_bytes))
-
-        Fs, data = read( self.outpath )
-
-        bag = []
-
-        for i in range(2):
-            data_mono = [d[i] for d in data]
-            data_fl = []
-            data_fl = fl_mono( data_mono, Fs )
-            data_fl = np.asarray(data_fl, dtype=np.int16)
-            bag.append(data_fl)
-
-        o = np.array([
-            [ lt, rt ] for lt, rt in zip(bag[0], bag[1])
-        ])
-
-        write(self.outpath, Fs, o)
-        
-
-        

@@ -56,18 +56,33 @@
                 {% if html_for == 'AE' %}
                 {% include 'add_effect.html' %}
 
-
                 {% elif html_for == 'UA' %}
                 {% include 'upload_audio.html' %}
 
                 {% elif html_for == 'PA' %}
                 {% include 'no_audio.html' %}
 
+
                 {% elif html_for == 'DE' %}
-                {% include 'delay.html' %}
+                <h2 class="title">Delay</h2>
+                {% include 'effect_page/delay.html' %}
 
                 {% elif html_for == 'FL' %}
-                {% include 'flanger.html' %}
+                <h2 class="title">Flanger</h2>
+                {% include 'effect_page/flanger.html' %}
+
+                {% elif html_for == 'DI' %}
+                <h2 class="title">Distortion</h2>
+                {% include 'effect_page/distortion.html' %}
+
+                {% elif html_for == 'TR' %}
+                <h2 class="title">Tremolo</h2>
+                {% include 'effect_page/tremolo.html' %}
+
+                {% elif html_for == 'PH' %}
+                <h2 class="title">Phaser</h2>
+                {% include 'effect_page/phaser.html' %}
+
 
                 {% endif %}
 

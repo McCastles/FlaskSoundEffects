@@ -1,5 +1,9 @@
 <!-- hardcoded -->
 
+{% if saved_msg %}
+<h1 class="title">{{saved_msg}}</h1>
+{% endif %}
+
 <table style="width:50%; height: 80%;">
 
     <tc>
@@ -20,6 +24,24 @@
         <td>
             <a href="/?html_for=FL">
                 <div class="flanger">Flanger</div>
+            </a>
+        </td>
+
+        <td>
+            <a href="/?html_for=DI">
+                <div class="distortion">Distortion</div>
+            </a>
+        </td>
+
+        <td>
+            <a href="/?html_for=PH">
+                <div class="phaser">Phaser</div>
+            </a>
+        </td>
+
+        <td>
+            <a href="/?html_for=TR">
+                <div class="tremolo">Tremolo</div>
             </a>
         </td>
 
