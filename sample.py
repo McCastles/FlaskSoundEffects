@@ -53,7 +53,7 @@ class Sample:
 
     def delay( self, x, params ):
         
-        feedback = int(params['factor']) // 100
+        feedback = int(params['factor']) / 100
         delaytime = int(params['time'])
         
         # someday...
@@ -65,7 +65,7 @@ class Sample:
 
         for i in range( offset, len(x) ):
             if (i-offset)>0:
-                y[i] = x[i] + (feedback) * (y[ i-offset ])
+                y[i] = x[i] + (feedback) * (x[ i-offset ])
 
         return y
                 
@@ -126,8 +126,8 @@ class Sample:
 
     def apply_effect( self, audio, effect_code, params ):
 
-        print('Len before:', len(audio))
-        
+        # print('Len before:', len(audio[:-5]))
+        # print(audio[:-5])
 
         effect = self.effect_mapping[ effect_code ]
 
@@ -142,8 +142,8 @@ class Sample:
             [ lt, rt ] for lt, rt in zip(bag[0], bag[1])
         ])
 
-        # print('\nmerged\n', merged)
-        print('Len after:', len(merged))
+        # print('\nmerged\n', merged[:-5])
+        # print('Len after:', len(merged))
         return merged
 
 
@@ -163,11 +163,12 @@ class Sample:
             _, audio = read( self.outpath )
 
 
-            audio = self.apply_effect( audio, effect['code'], effect['params'] )
-
             if not divided:
+
                 audio = audio / 32767
                 divided = True
+
+            audio = self.apply_effect( audio, effect['code'], effect['params'] )
 
 
             print('Applied', effect['code'], effect['id'], 'with params:', effect['params'])
