@@ -27,7 +27,7 @@ existing_modules = {
     },
 
     'DI': {'id':None, 'code':'DI', 'title': 'Distortion',
-        'params':{'clipVal':0.05},
+        'params':{'clipVal':5},
         'colorscheme': 'distortion'
     },
 
